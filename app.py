@@ -225,7 +225,6 @@ def calculate_average_rating(movie_id):
         return 0
     total = sum(f['rating'] for f in movie_feedbacks)
     return round(total / len(movie_feedbacks), 1)
-
 def get_review_count(movie_id):
     """
     Get review count for a movie
@@ -418,7 +417,6 @@ def internal_error(e):
 #   Or with nginx reverse proxy on port 80
 #
 # =============================================================================
-
 if __name__ == '__main__':
     # Development server
     # Set debug=False in production!

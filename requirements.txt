@@ -7,10 +7,8 @@
 # Core Framework
 Flask==3.0.0
 Werkzeug==3.0.1
-
 # Production WSGI Server
 gunicorn==21.2.0
-
 # MySQL Database Connector (for AWS RDS)
 mysql-connector-python==8.2.0
 

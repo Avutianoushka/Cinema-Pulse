@@ -14,11 +14,9 @@
 # 2. Clone your project repository
 # 3. Run: chmod +x deploy.sh && ./deploy.sh
 # =============================================================================
-
 echo "=========================================="
 echo "CinemaPulse - AWS Deployment Script"
 echo "=========================================="
-
 # Update system packages
 echo "[1/8] Updating system packages..."
 sudo yum update -y 2>/dev/null || sudo apt update -y
@@ -35,7 +33,6 @@ sudo yum install git -y 2>/dev/null || sudo apt install git -y
 echo "[4/8] Setting up application directory..."
 sudo mkdir -p /opt/cinemapulse
 sudo chown $USER:$USER /opt/cinemapulse
-
 # Create virtual environment
 echo "[5/8] Creating virtual environment..."
 cd /opt/cinemapulse

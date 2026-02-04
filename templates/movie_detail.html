@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ movie.title }}{% endblock %}
-
 {% block content %}
 <section class="fade-in">
     <a href="{{ url_for('home') }}" class="mb-6 text-gray-400 hover:text-white transition-colors inline-block">
         <i class="fas fa-arrow-left mr-2"></i>Back to Movies
     </a>
-    
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Movie Info -->
         <div class="lg:col-span-2">

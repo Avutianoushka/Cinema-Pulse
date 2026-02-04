@@ -8,11 +8,9 @@
 -- 2. Run this script:
 --    source setup_rds.sql
 -- =============================================================================
-
 -- Create database
 CREATE DATABASE IF NOT EXISTS cinemapulse;
 USE cinemapulse;
-
 -- =============================================================================
 -- MOVIES TABLE
 -- =============================================================================
@@ -37,7 +35,6 @@ CREATE TABLE IF NOT EXISTS genres (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- =============================================================================
 -- MOVIE_GENRES TABLE (Many-to-Many Relationship)
 -- =============================================================================
