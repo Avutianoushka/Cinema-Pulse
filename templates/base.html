@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CinemaPulse{% endblock %} - Real-Time Customer Feedback</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(229, 62, 62, 0.3);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(229, 62, 62, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(229, 62, 62, 0.8); }
+        }
+        
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        
+        .star-rating label {
+            cursor: pointer;
+            font-size: 2rem;
+            color: #4a5568;
+            transition: color 0.2s;
+        }
+        
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input[type="radio"]:checked ~ label {
+            color: #fbbf24;
+        }
+        
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .rating-bar {
+            transition: width 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Navigation Header -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="{{ url_for('home') }}" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center pulse-glow">
+                        <i class="fas fa-film text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold">
+                        <span class="text-red-500">Cinema</span><span class="text-white">Pulse</span>
+                    </h1>
+                </a>
+                <div class="flex items-center gap-6">
+                    <a href="{{ url_for('home') }}" class="hover:text-red-400 transition-colors">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <a href="{{ url_for('analytics') }}" class="hover:text-red-400 transition-colors">
+                        <i class="fas fa-chart-bar mr-2"></i>Analytics
+                    </a>
+                    <div class="bg-red-600/20 px-4 py-2 rounded-full border border-red-500/50">
+                        <i class="fas fa-ticket-alt mr-2 text-red-400"></i>
+                        <span id="totalReviewsNav">{{ total_reviews }}</span> Reviews
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed top-20 right-4 z-50 space-y-2">
+                {% for category, message in messages %}
+                    <div class="px-6 py-3 rounded-lg shadow-lg fade-in
+                        {% if category == 'error' %}bg-red-600{% else %}bg-green-600{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-12 px-4 max-w-7xl mx-auto">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/30 border-t border-white/10 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                <span class="text-red-500">Cinema</span>Pulse © 2024 | 
+                Real-Time Customer Feedback Analysis Platform
+            </p>
+            <p class="text-gray-500 text-sm mt-2">
+                <!-- AWS EC2 Deployment: Update with your EC2 public IP -->
+                Running on AWS EC2
+            </p>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

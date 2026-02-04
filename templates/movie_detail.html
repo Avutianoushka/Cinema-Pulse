@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<section class="fade-in">
+    <a href="{{ url_for('home') }}" class="mb-6 text-gray-400 hover:text-white transition-colors inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Movies
+    </a>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Movie Info -->
+        <div class="lg:col-span-2">
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10">
+                <img src="{{ movie.image }}" alt="{{ movie.title }}" class="w-full h-80 object-cover">
+                <div class="p-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-3xl font-bold">{{ movie.title }}</h2>
+                        <div class="flex items-center gap-2 bg-yellow-500/20 px-4 py-2 rounded-full">
+                            <i class="fas fa-star text-yellow-400"></i>
+                            <span class="font-bold">{{ avg_rating }}</span>
+                            <span class="text-gray-400">({{ review_count }} reviews)</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mb-4">
+                        {% for genre in movie.genres %}
+                        <span class="bg-red-500/20 text-red-400 px-4 py-1 rounded-full text-sm">{{ genre }}</span>
+                        {% endfor %}
+                    </div>
+                    <p class="text-gray-300 leading-relaxed mb-6">{{ movie.description }}</p>
+                    
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <p class="text-gray-400 text-sm">Director</p>
+                            <p class="font-semibold">{{ movie.director }}</p>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <p class="text-gray-400 text-sm">Duration</p>
+                            <p class="font-semibold">{{ movie.duration }}</p>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <p class="text-gray-400 text-sm">Year</p>
+                            <p class="font-semibold">{{ movie.year }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="mt-8 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <h3 class="text-xl font-bold mb-6">
+                    <i class="fas fa-comments text-red-500 mr-2"></i>Customer Reviews
+                </h3>
+                <div class="space-y-4">
+                    {% if feedbacks %}
+                        {% for feedback in feedbacks %}
+                        <div class="bg-white/5 rounded-xl p-5 border border-white/10">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-purple-500 rounded-full flex items-center justify-center">
+                                        <span class="font-bold text-sm">{{ feedback.user_name[0]|upper }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">{{ feedback.user_name }}</p>
+                                        <p class="text-gray-500 text-xs">{{ feedback.created_at }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-1">
+                                    {% for i in range(5) %}
+                                        {% if i < feedback.rating %}
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                        {% else %}
+                                            <i class="fas fa-star text-gray-600"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="text-gray-300">{{ feedback.comment }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-400 text-center py-8">No reviews yet. Be the first to share your experience!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 sticky top-28">
+                <h3 class="text-xl font-bold mb-6">
+                    <i class="fas fa-edit text-red-500 mr-2"></i>Submit Your Feedback
+                </h3>
+                
+                <form action="{{ url_for('submit_feedback') }}" method="POST">
+                    <input type="hidden" name="movie_id" value="{{ movie.id }}">
+                    
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Your Name</label>
+                        <input type="text" name="user_name" required 
+                            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors"
+                            placeholder="Enter your name">
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                        <input type="email" name="user_email" required 
+                            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors"
+                            placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Your Rating</label>
+                        <div class="star-rating">
+                            <input type="radio" name="rating" id="star5" value="5" required>
+                            <label for="star5"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" id="star4" value="4">
+                            <label for="star4"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" id="star3" value="3">
+                            <label for="star3"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" id="star2" value="2">
+                            <label for="star2"><i class="fas fa-star"></i></label>
+                            <input type="radio" name="rating" id="star1" value="1">
+                            <label for="star1"><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Your Comment</label>
+                        <textarea name="comment" required rows="4"
+                            class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition-colors resize-none"
+                            placeholder="Share your experience..."></textarea>
+                    </div>
+                    
+                    <button type="submit" 
+                        class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-red-500/50">
+                        <i class="fas fa-paper-plane mr-2"></i>Submit Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

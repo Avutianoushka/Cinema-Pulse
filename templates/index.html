@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="fade-in">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            Real-Time <span class="text-red-500">Customer Feedback</span> Analysis
+        </h2>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+            Share your movie experience and help others discover great films. 
+            Your feedback matters!
+        </p>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
+            <i class="fas fa-film text-4xl text-red-500 mb-3"></i>
+            <h3 class="text-3xl font-bold">{{ movies|length }}</h3>
+            <p class="text-gray-400">Movies Available</p>
+        </div>
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
+            <i class="fas fa-comments text-4xl text-yellow-500 mb-3"></i>
+            <h3 class="text-3xl font-bold">{{ total_reviews }}</h3>
+            <p class="text-gray-400">Total Reviews</p>
+        </div>
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
+            <i class="fas fa-star text-4xl text-green-500 mb-3"></i>
+            <h3 class="text-3xl font-bold">{{ overall_avg }}</h3>
+            <p class="text-gray-400">Average Rating</p>
+        </div>
+    </div>
+
+    <!-- Movie Grid -->
+    <h3 class="text-2xl font-bold mb-6">
+        <i class="fas fa-fire text-red-500 mr-2"></i>Now Showing
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for movie in movies %}
+        <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" 
+           class="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 card-hover transition-all duration-300 block">
+            <div class="relative">
+                <img src="{{ movie.image }}" alt="{{ movie.title }}" 
+                     class="w-full h-56 object-cover">
+                <div class="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
+                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                    <span class="font-bold">{{ movie.avg_rating }}</span>
+                </div>
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-bold mb-2">{{ movie.title }}</h3>
+                <p class="text-gray-400 text-sm mb-4 line-clamp-2">{{ movie.description[:100] }}...</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {% for genre in movie.genres %}
+                    <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs">{{ genre }}</span>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center justify-between text-sm text-gray-400">
+                    <span><i class="fas fa-clock mr-1"></i>{{ movie.duration }}</span>
+                    <span><i class="fas fa-comments mr-1"></i>{{ movie.review_count }} reviews</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

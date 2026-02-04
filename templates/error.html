@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<section class="fade-in">
+    <div class="max-w-2xl mx-auto text-center py-20">
+        <div class="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-8">
+            <i class="fas fa-exclamation-triangle text-4xl text-white"></i>
+        </div>
+        <h2 class="text-4xl font-bold mb-4">Oops!</h2>
+        <p class="text-xl text-gray-400 mb-8">{{ error }}</p>
+        <a href="{{ url_for('home') }}" 
+           class="bg-red-600 hover:bg-red-500 px-8 py-4 rounded-xl transition-colors inline-block">
+            <i class="fas fa-home mr-2"></i>Back to Home
+        </a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+# =============================================================================
+# CinemaPulse - Python Dependencies
+# =============================================================================
+# Install with: pip install -r requirements.txt
+# =============================================================================
+
+# Core Framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# Production WSGI Server
+gunicorn==21.2.0
+
+# MySQL Database Connector (for AWS RDS)
+mysql-connector-python==8.2.0
+
+# Environment Variables Management
+python-dotenv==1.0.0
+
+# =============================================================================
+# OPTIONAL DEPENDENCIES (Uncomment as needed)
+# =============================================================================
+# Flask-SQLAlchemy==3.1.1      # ORM for database
+# Flask-Migrate==4.0.5         # Database migrations
+# Flask-Login==0.6.3           # User authentication
+# Flask-WTF==1.2.1             # Form handling
+# boto3==1.34.0                # AWS SDK for Python
+# redis==5.0.1                 # Session storage / caching

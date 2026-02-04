@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaPulse - AWS Deployment Guide</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        .gradient-bg { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+        .code-block { background: #0d1117; border: 1px solid #30363d; }
+        .pulse-glow { animation: pulse-glow 2s infinite; }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(229, 62, 62, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(229, 62, 62, 0.8); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center pulse-glow">
+                        <i class="fas fa-film text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold">
+                        <span class="text-red-500">Cinema</span><span class="text-white">Pulse</span>
+                    </h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="bg-green-600/20 text-green-400 px-4 py-2 rounded-full border border-green-500/50 text-sm">
+                        <i class="fas fa-cloud mr-2"></i>AWS Ready
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-12 px-4 max-w-6xl mx-auto">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                AWS <span class="text-red-500">Deployment</span> Guide
+            </h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                Complete step-by-step instructions to deploy CinemaPulse on AWS EC2 with RDS MySQL
+            </p>
+        </div>
+
+        <!-- Project Files Overview -->
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mb-8">
+            <h3 class="text-2xl font-bold mb-6">
+                <i class="fas fa-folder-open text-yellow-500 mr-3"></i>Project Structure
+            </h3>
+            <div class="code-block rounded-xl p-6 overflow-x-auto">
+                <pre class="text-green-400 text-sm">
+cinemapulse/
+├── app.py                 # Flask application (main entry point)
+├── requirements.txt       # Python dependencies
+├── deploy.sh             # EC2 deployment script
+├── setup_rds.sql         # MySQL database setup
+├── .env                  # Environment variables (create on EC2)
+└── templates/
+    ├── base.html         # Base template with navigation
+    ├── index.html        # Home page (movie listings)
+    ├── movie_detail.html # Movie details + feedback form
+    ├── thank_you.html    # Feedback confirmation
+    ├── analytics.html    # Analytics dashboard
+    └── error.html        # Error page
+                </pre>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Guide -->
+        <div class="space-y-8">
+            <!-- Step 1: Create EC2 -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-xl font-bold">1</div>
+                    <h3 class="text-2xl font-bold">Create EC2 Instance</h3>
+                </div>
+                <div class="space-y-4 text-gray-300">
+                    <p><strong class="text-white">AWS Console → EC2 → Launch Instance</strong></p>
+                    <ul class="list-disc list-inside space-y-2 ml-4">
+                        <li>Name: <code class="bg-white/10 px-2 py-1 rounded">cinemapulse-server</code></li>
+                        <li>AMI: Amazon Linux 2023 or Ubuntu 22.04</li>
+                        <li>Instance Type: <code class="bg-white/10 px-2 py-1 rounded">t2.micro</code> (Free Tier)</li>
+                        <li>Key Pair: Create new or select existing</li>
+                        <li>Storage: 8 GB gp2</li>
+                    </ul>
+                    <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mt-4">
+                        <p class="text-yellow-400"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Security Group Rules:</strong></p>
+                        <ul class="list-disc list-inside mt-2 text-yellow-300">
+                            <li>SSH (22) - Your IP</li>
+                            <li>HTTP (80) - Anywhere</li>
+                            <li>Custom TCP (5000) - Anywhere</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Create RDS -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold">2</div>
+                    <h3 class="text-2xl font-bold">Create RDS MySQL Instance</h3>
+                </div>
+                <div class="space-y-4 text-gray-300">
+                    <p><strong class="text-white">AWS Console → RDS → Create Database</strong></p>
+                    <ul class="list-disc list-inside space-y-2 ml-4">
+                        <li>Engine: MySQL 8.0</li>
+                        <li>Template: Free Tier</li>
+                        <li>DB Instance ID: <code class="bg-white/10 px-2 py-1 rounded">cinemapulse-db</code></li>
+                        <li>Master Username: <code class="bg-white/10 px-2 py-1 rounded">admin</code></li>
+                        <li>Master Password: <em>Your secure password</em></li>
+                        <li>Instance: <code class="bg-white/10 px-2 py-1 rounded">db.t3.micro</code></li>
+                        <li>Public Access: Yes (for initial setup)</li>
+                    </ul>
+                    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mt-4">
+                        <p class="text-blue-400"><i class="fas fa-database mr-2"></i><strong>RDS Security Group:</strong></p>
+                        <p class="text-blue-300 mt-2">Add inbound rule: MySQL/Aurora (3306) from EC2 Security Group</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: SSH & Deploy -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-xl font-bold">3</div>
+                    <h3 class="text-2xl font-bold">SSH & Deploy Application</h3>
+                </div>
+                <div class="code-block rounded-xl p-6 overflow-x-auto mb-4">
+                    <pre class="text-gray-300 text-sm">
+<span class="text-gray-500"># Connect to EC2</span>
+<span class="text-green-400">ssh</span> -i your-key.pem ec2-user@YOUR-EC2-PUBLIC-IP
+
+<span class="text-gray-500"># Update system</span>
+<span class="text-green-400">sudo</span> yum update -y
+
+<span class="text-gray-500"># Install dependencies</span>
+<span class="text-green-400">sudo</span> yum install python3 python3-pip git -y
+
+<span class="text-gray-500"># Clone project (or upload via SCP)</span>
+<span class="text-green-400">git</span> clone https://github.com/yourusername/cinemapulse.git
+<span class="text-green-400">cd</span> cinemapulse
+
+<span class="text-gray-500"># Create virtual environment</span>
+<span class="text-green-400">python3</span> -m venv venv
+<span class="text-green-400">source</span> venv/bin/activate
+
+<span class="text-gray-500"># Install Python packages</span>
+<span class="text-green-400">pip</span> install -r requirements.txt
+                    </pre>
+                </div>
+            </div>
+
+            <!-- Step 4: Configure Database -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-xl font-bold">4</div>
+                    <h3 class="text-2xl font-bold">Configure Database</h3>
+                </div>
+                <div class="code-block rounded-xl p-6 overflow-x-auto mb-4">
+                    <pre class="text-gray-300 text-sm">
+<span class="text-gray-500"># Connect to RDS and setup database</span>
+<span class="text-green-400">mysql</span> -h YOUR-RDS-ENDPOINT.rds.amazonaws.com -u admin -p
+
+<span class="text-gray-500"># Run the setup script</span>
+<span class="text-yellow-400">mysql></span> source setup_rds.sql
+
+<span class="text-gray-500"># Verify</span>
+<span class="text-yellow-400">mysql></span> USE cinemapulse;
+<span class="text-yellow-400">mysql></span> SHOW TABLES;
+<span class="text-yellow-400">mysql></span> SELECT COUNT(*) FROM movies;
+                    </pre>
+                </div>
+            </div>
+
+            <!-- Step 5: Environment Variables -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-xl font-bold">5</div>
+                    <h3 class="text-2xl font-bold">Set Environment Variables</h3>
+                </div>
+                <div class="code-block rounded-xl p-6 overflow-x-auto mb-4">
+                    <pre class="text-gray-300 text-sm">
+<span class="text-gray-500"># Create .env file</span>
+<span class="text-green-400">nano</span> .env
+
+<span class="text-gray-500"># Add these variables:</span>
+<span class="text-blue-400">FLASK_APP</span>=app.py
+<span class="text-blue-400">FLASK_ENV</span>=production
+<span class="text-blue-400">SECRET_KEY</span>=your-super-secret-random-key
+
+<span class="text-blue-400">DB_HOST</span>=your-rds-endpoint.rds.amazonaws.com
+<span class="text-blue-400">DB_PORT</span>=3306
+<span class="text-blue-400">DB_USER</span>=admin
+<span class="text-blue-400">DB_PASSWORD</span>=your-rds-password
+<span class="text-blue-400">DB_NAME</span>=cinemapulse
+                    </pre>
+                </div>
+            </div>
+
+            <!-- Step 6: Run Application -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-xl font-bold">6</div>
+                    <h3 class="text-2xl font-bold">Run Application</h3>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-yellow-400 mb-3">Development Mode</h4>
+                        <div class="code-block rounded-xl p-4">
+                            <pre class="text-gray-300 text-sm">
+<span class="text-green-400">python</span> app.py
+
+<span class="text-gray-500"># Access at:</span>
+http://YOUR-EC2-IP:5000
+                            </pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold text-green-400 mb-3">Production Mode</h4>
+                        <div class="code-block rounded-xl p-4">
+                            <pre class="text-gray-300 text-sm">
+<span class="text-green-400">gunicorn</span> -w 4 -b 0.0.0.0:5000 app:app
+
+<span class="text-gray-500"># Or use the deploy script:</span>
+<span class="text-green-400">./deploy.sh</span>
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Enable RDS in app.py -->
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-xl font-bold">7</div>
+                    <h3 class="text-2xl font-bold">Enable RDS in app.py</h3>
+                </div>
+                <p class="text-gray-300 mb-4">Uncomment the MySQL configuration section in <code class="bg-white/10 px-2 py-1 rounded">app.py</code>:</p>
+                <div class="code-block rounded-xl p-6 overflow-x-auto">
+                    <pre class="text-gray-300 text-sm">
+<span class="text-blue-400">import</span> mysql.connector
+<span class="text-blue-400">from</span> mysql.connector <span class="text-blue-400">import</span> pooling
+<span class="text-blue-400">import</span> os
+
+DB_CONFIG = {
+    <span class="text-green-400">'host'</span>: os.environ.get(<span class="text-green-400">'DB_HOST'</span>),
+    <span class="text-green-400">'user'</span>: os.environ.get(<span class="text-green-400">'DB_USER'</span>),
+    <span class="text-green-400">'password'</span>: os.environ.get(<span class="text-green-400">'DB_PASSWORD'</span>),
+    <span class="text-green-400">'database'</span>: os.environ.get(<span class="text-green-400">'DB_NAME'</span>),
+    <span class="text-green-400">'pool_name'</span>: <span class="text-green-400">'cinemapulse_pool'</span>,
+    <span class="text-green-400">'pool_size'</span>: 5
+}
+
+<span class="text-blue-400">def</span> <span class="text-yellow-400">get_db_connection</span>():
+    connection_pool = mysql.connector.pooling.MySQLConnectionPool(**DB_CONFIG)
+    <span class="text-blue-400">return</span> connection_pool.get_connection()
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Commands Reference -->
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mt-8">
+            <h3 class="text-2xl font-bold mb-6">
+                <i class="fas fa-terminal text-green-500 mr-3"></i>Quick Commands Reference
+            </h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-yellow-400 mb-3">Service Management</h4>
+                    <div class="code-block rounded-xl p-4 text-sm">
+                        <p><span class="text-gray-500"># Check status</span></p>
+                        <p class="text-green-400">sudo systemctl status cinemapulse</p>
+                        <p class="mt-2"><span class="text-gray-500"># Restart service</span></p>
+                        <p class="text-green-400">sudo systemctl restart cinemapulse</p>
+                        <p class="mt-2"><span class="text-gray-500"># View logs</span></p>
+                        <p class="text-green-400">sudo journalctl -u cinemapulse -f</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-blue-400 mb-3">Database Commands</h4>
+                    <div class="code-block rounded-xl p-4 text-sm">
+                        <p><span class="text-gray-500"># Connect to RDS</span></p>
+                        <p class="text-green-400">mysql -h ENDPOINT -u admin -p</p>
+                        <p class="mt-2"><span class="text-gray-500"># Backup database</span></p>
+                        <p class="text-green-400">mysqldump -h ENDPOINT -u admin -p cinemapulse > backup.sql</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 mt-8">
+            <h3 class="text-2xl font-bold mb-6">
+                <i class="fas fa-sitemap text-purple-500 mr-3"></i>AWS Architecture
+            </h3>
+            <div class="flex flex-wrap justify-center items-center gap-4 text-center">
+                <div class="bg-blue-500/20 border border-blue-500/50 rounded-xl p-6 w-40">
+                    <i class="fas fa-user text-4xl text-blue-400 mb-2"></i>
+                    <p class="font-semibold">Users</p>
+                </div>
+                <i class="fas fa-arrow-right text-2xl text-gray-500"></i>
+                <div class="bg-orange-500/20 border border-orange-500/50 rounded-xl p-6 w-40">
+                    <i class="fas fa-server text-4xl text-orange-400 mb-2"></i>
+                    <p class="font-semibold">EC2</p>
+                    <p class="text-xs text-gray-400">Flask App</p>
+                </div>
+                <i class="fas fa-arrow-right text-2xl text-gray-500"></i>
+                <div class="bg-blue-500/20 border border-blue-500/50 rounded-xl p-6 w-40">
+                    <i class="fas fa-database text-4xl text-blue-400 mb-2"></i>
+                    <p class="font-semibold">RDS</p>
+                    <p class="text-xs text-gray-400">MySQL</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Checklist -->
+        <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-8 mt-8">
+            <h3 class="text-2xl font-bold text-green-400 mb-6">
+                <i class="fas fa-check-circle mr-3"></i>Deployment Checklist
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>EC2 instance created and running</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>RDS MySQL instance created</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>Security groups configured correctly</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>Database tables created</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>Environment variables set</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>Application running with gunicorn</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>Systemd service enabled</span>
+                </label>
+                <label class="flex items-center gap-3 text-gray-300">
+                    <input type="checkbox" class="w-5 h-5 rounded">
+                    <span>Website accessible via public IP</span>
+                </label>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/30 border-t border-white/10 py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-gray-400">
+                <span class="text-red-500">Cinema</span>Pulse © 2024 | 
+                AWS Deployment Guide
+            </p>
+            <p class="text-gray-500 text-sm mt-2">
+                <i class="fab fa-aws mr-2"></i>Designed for AWS EC2 + RDS Deployment
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

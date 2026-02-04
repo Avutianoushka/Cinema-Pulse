@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Thank You{% endblock %}
+
+{% block content %}
+<section class="fade-in">
+    <div class="max-w-2xl mx-auto text-center py-20">
+        <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+            <i class="fas fa-check text-4xl text-white"></i>
+        </div>
+        <h2 class="text-4xl font-bold mb-4">Thank You!</h2>
+        <p class="text-xl text-gray-400 mb-8">
+            Your feedback has been submitted successfully. 
+            Your opinion helps other movie lovers make better choices!
+        </p>
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 mb-8">
+            <h3 class="font-semibold mb-2">Your Review Summary</h3>
+            <p class="text-gray-400">
+                You rated <strong class="text-white">{{ movie.title }}</strong> with 
+                <strong class="text-yellow-400">{{ feedback.rating }} stars</strong>
+            </p>
+            <div class="flex justify-center gap-1 my-3">
+                {% for i in range(5) %}
+                    {% if i < feedback.rating %}
+                        <i class="fas fa-star text-yellow-400 text-2xl"></i>
+                    {% else %}
+                        <i class="fas fa-star text-gray-600 text-2xl"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <p class="text-gray-300 italic">"{{ feedback.comment[:150] }}{% if feedback.comment|length > 150 %}...{% endif %}"</p>
+        </div>
+        <div class="flex gap-4 justify-center">
+            <a href="{{ url_for('home') }}" 
+               class="bg-white/10 hover:bg-white/20 px-8 py-4 rounded-xl transition-colors inline-block">
+                <i class="fas fa-home mr-2"></i>Back to Home
+            </a>
+            <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" 
+               class="bg-red-600 hover:bg-red-500 px-8 py-4 rounded-xl transition-colors inline-block">
+                <i class="fas fa-film mr-2"></i>View Movie
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
